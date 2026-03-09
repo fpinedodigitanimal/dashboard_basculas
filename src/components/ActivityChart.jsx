@@ -62,7 +62,14 @@ export default function ActivityChart({ data }) {
               stroke="#0ea5e9"
               strokeWidth={activeDataKey === 'pesajes' ? 4 : 2.5}
               dot={false}
-              activeDot={false}
+              activeDot={{ 
+                r: 6, 
+                fill: '#0ea5e9',
+                stroke: '#fff',
+                strokeWidth: 2,
+                onMouseEnter: () => setActiveDataKey('pesajes'),
+                onMouseLeave: () => setActiveDataKey(null)
+              }}
               name="Pesajes"
               onMouseEnter={() => setActiveDataKey('pesajes')}
               onMouseLeave={() => setActiveDataKey(null)}
@@ -73,7 +80,14 @@ export default function ActivityChart({ data }) {
               stroke="#10b981"
               strokeWidth={activeDataKey === 'activas' ? 4 : 2.5}
               dot={false}
-              activeDot={false}
+              activeDot={{ 
+                r: 6, 
+                fill: '#10b981',
+                stroke: '#fff',
+                strokeWidth: 2,
+                onMouseEnter: () => setActiveDataKey('activas'),
+                onMouseLeave: () => setActiveDataKey(null)
+              }}
               name="Básculas Activas"
               onMouseEnter={() => setActiveDataKey('activas')}
               onMouseLeave={() => setActiveDataKey(null)}

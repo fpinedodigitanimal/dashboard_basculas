@@ -185,7 +185,14 @@ export default function WeightHistogram({ data, filter = 'all' }) {
                   fill={`url(#color-${scale.scale_id})`}
                   fillOpacity={isActive ? 0.8 : 0.6}
                   name={scale.scale_id}
-                  activeDot={false}
+                  activeDot={{ 
+                    r: 5, 
+                    fill: colors[idx % colors.length],
+                    stroke: isDarkMode ? '#1a1a1a' : '#fff',
+                    strokeWidth: 2,
+                    onMouseEnter: () => setActiveDataKey(scale.scale_id),
+                    onMouseLeave: () => setActiveDataKey(null)
+                  }}
                   onMouseEnter={() => setActiveDataKey(scale.scale_id)}
                   onMouseLeave={() => setActiveDataKey(null)}
                 />
