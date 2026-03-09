@@ -166,17 +166,19 @@ export default function VolumeChart({ data, filter = 'all' }) {
             />
             {filteredData.map((scale, idx) => {
               const isTop = top5Scales.includes(scale.scale_id)
+              const isActive = activeDataKey === scale.scale_id
+              const baseWidth = isDarkMode ? (isTop ? 3 : 2) : (isTop ? 2.5 : 1.5)
               return (
                 <Line
                   key={scale.scale_id}
                   type="monotone"
                   dataKey={scale.scale_id}
                   stroke={colors[idx % colors.length]}
-                  strokeWidth={isDarkMode ? (isTop ? 3 : 2) : (isTop ? 2.5 : 1.5)}
+                  strokeWidth={isActive ? baseWidth + 2 : baseWidth}
                   dot={false}
-                  activeDot={{ r: 6 }}
+                  activeDot={{ r: 8, strokeWidth: 0 }}
                   name={scale.scale_id}
-                  opacity={isTop ? 1 : 0.85}
+                  opacity={isActive ? 1 : (isTop ? 0.85 : 0.7)}
                   onMouseEnter={() => setActiveDataKey(scale.scale_id)}
                   onMouseLeave={() => setActiveDataKey(null)}
                 />

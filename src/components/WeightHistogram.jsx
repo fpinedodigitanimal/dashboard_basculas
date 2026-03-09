@@ -173,20 +173,24 @@ export default function WeightHistogram({ data, filter = 'all' }) {
               iconType="line"
               iconSize={8}
             />
-            {filteredData.map((scale, idx) => (
-              <Area
-                key={scale.scale_id}
-                type="monotone"
-                dataKey={scale.scale_id}
-                stroke={colors[idx % colors.length]}
-                strokeWidth={1.5}
-                fill={`url(#color-${scale.scale_id})`}
-                fillOpacity={0.6}
-                name={scale.scale_id}
-                onMouseEnter={() => setActiveDataKey(scale.scale_id)}
-                onMouseLeave={() => setActiveDataKey(null)}
-              />
-            ))}
+            {filteredData.map((scale, idx) => {
+              const isActive = activeDataKey === scale.scale_id
+              return (
+                <Area
+                  key={scale.scale_id}
+                  type="monotone"
+                  dataKey={scale.scale_id}
+                  stroke={colors[idx % colors.length]}
+                  strokeWidth={isActive ? 3 : 1.5}
+                  fill={`url(#color-${scale.scale_id})`}
+                  fillOpacity={isActive ? 0.8 : 0.6}
+                  name={scale.scale_id}
+                  activeDot={{ r: 8, strokeWidth: 0 }}
+                  onMouseEnter={() => setActiveDataKey(scale.scale_id)}
+                  onMouseLeave={() => setActiveDataKey(null)}
+                />
+              )
+            })}
           </AreaChart>
         </ResponsiveContainer>
       </div>

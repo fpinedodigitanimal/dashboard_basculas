@@ -60,9 +60,9 @@ export default function ActivityChart({ data }) {
               type="monotone"
               dataKey="pesajes"
               stroke="#0ea5e9"
-              strokeWidth={2}
-              dot={{ fill: '#0ea5e9', r: 4 }}
-              activeDot={{ r: 6 }}
+              strokeWidth={activeDataKey === 'pesajes' ? 4 : 2.5}
+              dot={false}
+              activeDot={{ r: 8, strokeWidth: 0 }}
               name="Pesajes"
               onMouseEnter={() => setActiveDataKey('pesajes')}
               onMouseLeave={() => setActiveDataKey(null)}
@@ -71,9 +71,9 @@ export default function ActivityChart({ data }) {
               type="monotone"
               dataKey="activas"
               stroke="#10b981"
-              strokeWidth={2}
-              dot={{ fill: '#10b981', r: 4 }}
-              activeDot={{ r: 6 }}
+              strokeWidth={activeDataKey === 'activas' ? 4 : 2.5}
+              dot={false}
+              activeDot={{ r: 8, strokeWidth: 0 }}
               name="Básculas Activas"
               onMouseEnter={() => setActiveDataKey('activas')}
               onMouseLeave={() => setActiveDataKey(null)}
