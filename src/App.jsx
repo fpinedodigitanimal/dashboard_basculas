@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import Header from './components/Header'
 import KPICards from './components/KPICards'
@@ -30,29 +30,7 @@ function App() {
   const getEnabledScales = useMonitoringStore(state => state.getEnabledScales)
   const monitoring = useMonitoringStore(state => state.monitoring)
 
-  const loadData = async () => {
-    try {
-      setLoading(true)
-      const [dashboardData, statusData] = await Promise.all([
-        fetchDashboardData(selectedDate),
-        fetchRemoteIoTStatus()
-      ])
-      setData(dashboardData)
-      
-      // Filtrar alertas usando el estado de monitorización del store
-      const allAlerts = dashboardData.alerts || []
-      const enabledScales = getEnabledScales()
-      setAlerts(filterAlertsBySelection(allAlerts, enabledScales))
-      
-      setRemoteStatus(statusData)
-    } catch (error) {
-      console.error('Error cargando datos:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const filterAlertsBySelection = (allAlerts, enabledScales) => {
+  const filterAlertsBySelection = useCallback((allAlerts, enabledScales) => {
     // Si no hay básculas monitorizadas, no mostrar alertas
     if (!enabledScales || enabledScales.length === 0) {
       return []
@@ -64,7 +42,23 @@ function App() {
                           (alert.title && alert.title.match(/Báscula\s+(\S+)/)?.[1])
       return alertScaleId && enabledScales.includes(alertScaleId)
     })
-  }
+  }, [])
+
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true)
+      const [dashboardData, statusData] = await Promise.all([
+        fetchDashboardData(selectedDate),
+        fetchRemoteIoTStatus()
+      ])
+      setData(dashboardData)
+      setRemoteStatus(statusData)
+    } catch (error) {
+      console.error('Error cargando datos:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [selectedDate])
 
   const dismissAlert = (alertId) => {
     setAlerts(alerts.filter(a => a.id !== alertId))
@@ -97,10 +91,10 @@ function App() {
 
   const isToday = selectedDate === new Date().toISOString().split('T')[0]
 
-  // Cargar datos cuando cambia la fecha
+  // Cargar datos cuando cambia la fecha o al montar el componente
   useEffect(() => {
     loadData()
-  }, [selectedDate])
+  }, [loadData])
   
   // Auto-refresh cada 60s (solo si estamos en "hoy")
   useEffect(() => {
@@ -108,15 +102,16 @@ function App() {
     
     const interval = setInterval(loadData, 60000)
     return () => clearInterval(interval)
-  }, [isToday, selectedDate])
+  }, [isToday, loadData])
   
-  // Refiltrar alertas cuando cambie el estado de monitorización
+  // Refiltrar alertas cuando cambie el estado de monitorización o los datos
   useEffect(() => {
     if (data?.alerts) {
       const enabledScales = getEnabledScales()
-      setAlerts(filterAlertsBySelection(data.alerts, enabledScales))
+      const filteredAlerts = filterAlertsBySelection(data.alerts, enabledScales)
+      setAlerts(filteredAlerts)
     }
-  }, [monitoring])
+  }, [monitoring, data, getEnabledScales, filterAlertsBySelection])
 
   return (
     <ProtectedRoute>
