@@ -7,7 +7,7 @@ export default function GlobalHelp() {
   const sections = [
     {
       title: 'Indicadores Clave (KPIs)',
-      description: 'Panel superior con métricas principales: número de básculas activas, animales monitorizados (EPCs únicos), registros por hora promedio en las últimas 24h, tendencia de actividad (comparación hoy vs ayer) y número de básculas con alertas activas.'
+      description: 'Panel superior con métricas principales: número de básculas activas, animales monitorizados (EPCs únicos), registros por hora promedio en las últimas 24h, tendencia de actividad (comparación ayer vs anteayer, excluyendo hoy por ser día incompleto) y número de básculas con alertas activas.'
     },
     {
       title: 'Actividad últimos 30 días',

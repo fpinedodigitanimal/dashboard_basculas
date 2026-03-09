@@ -418,14 +418,17 @@ def get_kpis():
         # Animales únicos (EPCs únicos del día)
         total_animals = today_data['epc'].nunique() if not today_data.empty else 0
         
-        # Tendencia de actividad (comparación con ayer)
+        # Tendencia de actividad (ayer vs anteayer - días completos)
+        # No se incluye hoy porque es un día incompleto
         yesterday = today - timedelta(days=1)
+        day_before_yesterday = today - timedelta(days=2)
         yesterday_data = df[df['date'] == yesterday]
+        day_before_data = df[df['date'] == day_before_yesterday]
         
-        if len(yesterday_data) > 0:
-            activity_trend = round(((len(today_data) - len(yesterday_data)) / len(yesterday_data)) * 100, 1)
+        if len(day_before_data) > 0:
+            activity_trend = round(((len(yesterday_data) - len(day_before_data)) / len(day_before_data)) * 100, 1)
         else:
-            activity_trend = 0
+            activity_trend = 0 if len(yesterday_data) == 0 else 100
         
         # Básculas con alertas (inactivas > 24h)
         scales_with_alerts = 0
