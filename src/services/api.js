@@ -38,14 +38,14 @@ const mockData = {
     { fecha: '26 Feb', pesajes: 145, activas: 11 },
   ],
   tableData: [
-    { nombre: 'B-001', estado: 'conectado', ultimoPesaje: '10:45', totalHoy: 18, rfid: 'A1B2C3' },
-    { nombre: 'B-002', estado: 'conectado', ultimoPesaje: '10:42', totalHoy: 15, rfid: 'D4E5F6' },
-    { nombre: 'B-003', estado: 'desconectado', ultimoPesaje: '08:20', totalHoy: 0, rfid: '-' },
-    { nombre: 'B-004', estado: 'conectado', ultimoPesaje: '10:40', totalHoy: 22, rfid: 'G7H8I9' },
-    { nombre: 'B-005', estado: 'conectado', ultimoPesaje: '10:38', totalHoy: 19, rfid: 'J1K2L3' },
-    { nombre: 'B-006', estado: 'conectado', ultimoPesaje: '10:35', totalHoy: 16, rfid: 'M4N5O6' },
-    { nombre: 'B-007', estado: 'desconectado', ultimoPesaje: '-', totalHoy: 0, rfid: '-' },
-    { nombre: 'B-008', estado: 'conectado', ultimoPesaje: '10:30', totalHoy: 21, rfid: 'P7Q8R9' },
+    { scale_id: 'B-001', nombre: 'B-001', weight: 456.3, estado: 'conectado', ultimoPesaje: '10:45', created_at: '2026-03-09 10:45:23', totalHoy: 18, rfid: 'A1B2C3' },
+    { scale_id: 'B-002', nombre: 'B-002', weight: 523.7, estado: 'conectado', ultimoPesaje: '10:42', created_at: '2026-03-09 10:42:15', totalHoy: 15, rfid: 'D4E5F6' },
+    { scale_id: 'B-003', nombre: 'B-003', weight: 412.1, estado: 'desconectado', ultimoPesaje: '08:20', created_at: '2026-03-09 08:20:45', totalHoy: 0, rfid: '-' },
+    { scale_id: 'B-004', nombre: 'B-004', weight: 489.5, estado: 'conectado', ultimoPesaje: '10:40', created_at: '2026-03-09 10:40:32', totalHoy: 22, rfid: 'G7H8I9' },
+    { scale_id: 'B-005', nombre: 'B-005', weight: 501.2, estado: 'conectado', ultimoPesaje: '10:38', created_at: '2026-03-09 10:38:54', totalHoy: 19, rfid: 'J1K2L3' },
+    { scale_id: 'B-006', nombre: 'B-006', weight: 467.8, estado: 'conectado', ultimoPesaje: '10:35', created_at: '2026-03-09 10:35:21', totalHoy: 16, rfid: 'M4N5O6' },
+    { scale_id: 'B-007', nombre: 'B-007', weight: null, estado: 'desconectado', ultimoPesaje: '-', created_at: null, totalHoy: 0, rfid: '-' },
+    { scale_id: 'B-008', nombre: 'B-008', weight: 534.9, estado: 'conectado', ultimoPesaje: '10:30', created_at: '2026-03-09 10:30:18', totalHoy: 21, rfid: 'P7Q8R9' },
   ],
 }
 
