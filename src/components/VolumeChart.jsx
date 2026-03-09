@@ -176,7 +176,7 @@ export default function VolumeChart({ data, filter = 'all' }) {
                   stroke={colors[idx % colors.length]}
                   strokeWidth={isActive ? baseWidth + 2 : baseWidth}
                   dot={false}
-                  activeDot={{ r: 8, strokeWidth: 0 }}
+                  activeDot={false}
                   name={scale.scale_id}
                   opacity={isActive ? 1 : (isTop ? 0.85 : 0.7)}
                   onMouseEnter={() => setActiveDataKey(scale.scale_id)}
