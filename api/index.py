@@ -138,10 +138,10 @@ def get_kpis():
     
     kpis = {
         'activeScales': 8,
-        'totalScales': 12,
-        'todayWeights': 145,
-        'weightChange': 12,
-        'activeAlerts': 2
+        'totalAnimals': 142,
+        'recordsPerHour': 12.5,
+        'activityTrend': 8.3,
+        'scalesWithAlerts': 2
     }
     
     return jsonify(kpis), 200
