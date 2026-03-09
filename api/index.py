@@ -97,38 +97,49 @@ def auth_status():
 def get_dashboard():
     """Datos del dashboard (DEMO MODE)"""
     
-    # Datos de ejemplo
-    mock_data = {
-        'date': request.args.get('date', date.today().isoformat()),
-        'summary': {
-            'total_weights': 145,
-            'active_scales': 8,
-            'avg_weight': 652.3,
-            'total_animals': 142
-        },
-        'scales': [
+    # Estructura que el frontend espera
+    dashboard_data = {
+        'activeScales': 8,
+        'totalScales': 12,
+        'todayWeights': 145,
+        'weightChange': 12,
+        'activeAlerts': 2,
+        'alerts': [
             {
-                'id': f'B-{str(i).zfill(3)}',
-                'name': f'Báscula {i}',
-                'status': 'active' if i % 3 != 0 else 'inactive',
-                'last_weight': 650 + (i * 10),
-                'weights_today': 15 + i,
-                'last_activity': (datetime.now() - timedelta(hours=i)).isoformat()
-            }
-            for i in range(1, 13)
+                'id': 1,
+                'severity': 'warning',
+                'title': 'Báscula B-003 sin actividad',
+                'message': 'No se han registrado pesajes en las últimas 24 horas',
+                'details': 'Última conexión: 25 Feb 2026 14:30',
+            },
+            {
+                'id': 2,
+                'severity': 'critical',
+                'title': 'Conexión perdida',
+                'message': 'Báscula B-007 no responde',
+                'details': 'Error desde: 26 Feb 2026 08:15',
+            },
         ],
-        'recent_weights': [
-            {
-                'timestamp': (datetime.now() - timedelta(minutes=i*5)).isoformat(),
-                'scale_id': f'B-{str((i % 12) + 1).zfill(3)}',
-                'weight': 600 + (i * 15),
-                'epc': f'EPC{str(1000 + i)}'
-            }
-            for i in range(20)
-        ]
+        'chartData': [
+            {'fecha': '22 Feb', 'pesajes': 120, 'activas': 10},
+            {'fecha': '23 Feb', 'pesajes': 135, 'activas': 11},
+            {'fecha': '24 Feb', 'pesajes': 128, 'activas': 10},
+            {'fecha': '25 Feb', 'pesajes': 142, 'activas': 12},
+            {'fecha': '26 Feb', 'pesajes': 145, 'activas': 11},
+        ],
+        'tableData': [
+            {'nombre': 'B-001', 'estado': 'conectado', 'ultimoPesaje': '10:45', 'totalHoy': 18, 'rfid': 'A1B2C3'},
+            {'nombre': 'B-002', 'estado': 'conectado', 'ultimoPesaje': '10:42', 'totalHoy': 15, 'rfid': 'D4E5F6'},
+            {'nombre': 'B-003', 'estado': 'desconectado', 'ultimoPesaje': '08:20', 'totalHoy': 0, 'rfid': '-'},
+            {'nombre': 'B-004', 'estado': 'conectado', 'ultimoPesaje': '10:40', 'totalHoy': 22, 'rfid': 'G7H8I9'},
+            {'nombre': 'B-005', 'estado': 'conectado', 'ultimoPesaje': '10:38', 'totalHoy': 19, 'rfid': 'J1K2L3'},
+            {'nombre': 'B-006', 'estado': 'conectado', 'ultimoPesaje': '10:35', 'totalHoy': 16, 'rfid': 'M4N5O6'},
+            {'nombre': 'B-007', 'estado': 'desconectado', 'ultimoPesaje': '-', 'totalHoy': 0, 'rfid': '-'},
+            {'nombre': 'B-008', 'estado': 'conectado', 'ultimoPesaje': '10:30', 'totalHoy': 21, 'rfid': 'P7Q8R9'},
+        ],
     }
     
-    return jsonify(mock_data), 200
+    return jsonify(dashboard_data), 200
 
 
 @app.route('/api/kpis', methods=['GET'])
@@ -184,10 +195,16 @@ def monitoring_events():
 @app.route('/api/remoteiot/status', methods=['GET'])
 @login_required
 def remoteiot_status():
-    """Estado de RemoteIoT"""
+    """Estado de RemoteIoT - Devuelve estado de conexión de cada báscula"""
     return jsonify({
-        'status': 'demo',
-        'message': 'Modo DEMO - RemoteIoT no disponible'
+        'B-001': 'conectado',
+        'B-002': 'conectado',
+        'B-003': 'desconectado',
+        'B-004': 'conectado',
+        'B-005': 'conectado',
+        'B-006': 'conectado',
+        'B-007': 'desconectado',
+        'B-008': 'conectado',
     }), 200
 
 
