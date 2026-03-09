@@ -111,6 +111,10 @@ def normalize_log_weight(df: pd.DataFrame) -> pd.DataFrame:
     """Normaliza datos de log_weight igual que en dashboard_basculas.py"""
     if df is None or df.empty:
         return pd.DataFrame(columns=BASE_COLS)
+    
+    print(f"[DEBUG] normalize_log_weight - Columnas recibidas: {df.columns.tolist()}")
+    print(f"[DEBUG] normalize_log_weight - Primeras 3 filas de weight: {df['weight'].head(3).tolist() if 'weight' in df.columns else 'COLUMNA NO EXISTE'}")
+    
     for c in BASE_COLS:
         if c not in df.columns:
             df[c] = None
@@ -120,6 +124,10 @@ def normalize_log_weight(df: pd.DataFrame) -> pd.DataFrame:
     df["scale_id"] = df["scale_id"].astype(str)
     df["epc"] = df["epc"].astype(str)
     df["weight"] = pd.to_numeric(df["weight"], errors="coerce")
+    
+    print(f"[DEBUG] normalize_log_weight - Después de to_numeric, primeras 3 filas de weight: {df['weight'].head(3).tolist()}")
+    print(f"[DEBUG] normalize_log_weight - Estadísticas de weight: min={df['weight'].min()}, max={df['weight'].max()}, count={df['weight'].count()}")
+    
     # Filtrar básculas de simulación B00000 y B00100
     df = df[~df["scale_id"].isin(["B00000", "B00100"])]
     return df
@@ -238,6 +246,11 @@ def get_bascula_data():
             value=fecha_limite.strftime("%Y-%m-%d"), 
             operator="more"
         )
+        print(f"[DEBUG] Datos cargados de labs2: {len(df)} filas, columnas: {df.columns.tolist() if not df.empty else 'DF VACÍO'}")
+        if not df.empty:
+            print(f"[DEBUG] Muestra de datos crudos (primeras 3 filas):")
+            print(df[['scale_id', 'weight', 'created_at', 'epc']].head(3))
+        
         df = normalize_log_weight(df)
         if df.empty:
             print("[API] API devolvió vacío")
@@ -407,6 +420,10 @@ def get_dashboard_data():
             if not scale_df.empty:
                 last_weight = scale_df.iloc[-1]
                 
+                # Debug: ver el valor del peso
+                weight_value = last_weight['weight']
+                print(f"[DEBUG] Báscula {scale_id}: weight raw = {weight_value}, type = {type(weight_value)}, pd.notna = {pd.notna(weight_value)}")
+                
                 table_data.append({
                     'scale_id': scale_id,
                     'nombre': scale_id,
@@ -417,6 +434,10 @@ def get_dashboard_data():
                     'totalHoy': len(today_scale),
                     'rfid': str(last_weight['epc']) if pd.notna(last_weight['epc']) and last_weight['epc'] != '0' else '-'
                 })
+        
+        print(f"[DEBUG] table_data generado con {len(table_data)} básculas")
+        if len(table_data) > 0:
+            print(f"[DEBUG] Ejemplo de primera báscula: {table_data[0]}")
         
         # Heatmap data - registros por hora de ayer y hoy (48 horas)
         heatmap_data = []
