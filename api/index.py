@@ -418,9 +418,12 @@ def get_kpis():
 # ==================== MONITORING ====================
 
 @app.route('/api/scales/monitoring', methods=['GET'])
-@login_required
 def get_monitoring():
     """Estado de monitorización de todas las básculas"""
+    # Si no está autenticado, devolver array vacío
+    if not session.get('logged_in'):
+        return jsonify([]), 200
+    
     try:
         df = get_bascula_data()
         
@@ -453,9 +456,12 @@ def update_monitoring(scale_id):
     }), 200
 
 @app.route('/api/remoteiot/status', methods=['GET'])
-@login_required
 def get_remoteiot_status():
     """Estado de conexión RemoteIoT"""
+    # Si no está autenticado, devolver objeto vacío
+    if not session.get('logged_in'):
+        return jsonify({}), 200
+    
     try:
         df = get_bascula_data()
         
