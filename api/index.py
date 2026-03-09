@@ -35,6 +35,8 @@ ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'admin')
 
 # Decorador de autenticación
 def login_required(f):
+    from functools import wraps
+    @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('logged_in'):
             return jsonify({'error': 'No autenticado', 'message': 'Debe iniciar sesión'}), 401
@@ -199,25 +201,6 @@ def health():
         'mode': 'serverless',
         'timestamp': datetime.now().isoformat()
     }), 200
-
-
-# ==================== VERCEL HANDLER ====================
-
-# Esta es la función que Vercel llamará para cada request
-def handler(request):
-    """
-    Handler para Vercel Serverless Functions
-    """
-    with app.request_context(request.environ):
-        try:
-            response = app.full_dispatch_request()
-        except Exception as e:
-            response = jsonify({
-                'error': 'Internal Server Error',
-                'message': str(e)
-            }), 500
-        
-        return response
 
 
 # Para desarrollo local

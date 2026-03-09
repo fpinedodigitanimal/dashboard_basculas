@@ -117,100 +117,37 @@ const useMonitoringStore = create((set, get) => ({
     return get().errors.get(scaleId)
   },
   
-  // ===================== SSE METHODS =====================
+  // ===================== POLLING METHODS =====================
   
   /**
-   * Conecta al stream de eventos SSE para sincronización en tiempo real
+   * Inicia el polling periódico
    */
-  connectSSE: () => {
-    const currentEventSource = get().eventSource
+  startPolling: () => {
+    const { pollingInterval } = get()
     
-    // No reconectar si ya hay una conexión activa
-    if (currentEventSource && currentEventSource.readyState !== EventSource.CLOSED) {
-      console.log('[MonitoringStore] SSE already connected')
+    if (pollingInterval) {
+      console.log('[MonitoringStore] Polling already active')
       return
     }
     
-    try {
-      console.log('[MonitoringStore] Connecting to SSE...')
-      set({ reconnecting: true })
-      
-      const eventSource = new EventSource('/api/scales/monitoring/events')
-      
-      // Evento: scale.monitoring.updated
-      eventSource.addEventListener('scale.monitoring.updated', (e) => {
-        try {
-          const data = JSON.parse(e.data)
-          console.log('[MonitoringStore] SSE update received:', data.scale_id)
-          
-          get().setMonitoring(data.scale_id, data)
-          
-        } catch (error) {
-          console.error('[MonitoringStore] Error parsing SSE event:', error)
-        }
-      })
-      
-      // Evento: heartbeat
-      eventSource.addEventListener('heartbeat', (e) => {
-        try {
-          const data = JSON.parse(e.data)
-          set({ lastHeartbeat: data.timestamp })
-          console.log('[MonitoringStore] Heartbeat received')
-        } catch (error) {
-          console.error('[MonitoringStore] Error parsing heartbeat:', error)
-        }
-      })
-      
-      // Evento: sync.required (backend pide resincronización)
-      eventSource.addEventListener('sync.required', () => {
-        console.log('[MonitoringStore] Sync required by server')
-        get().loadInitialState()
-      })
-      
-      // Conexión abierta
-      eventSource.onopen = () => {
-        console.log('[MonitoringStore] SSE connected')
-        set({ 
-          connected: true, 
-          reconnecting: false,
-          eventSource 
-        })
-      }
-      
-      // Error de conexión
-      eventSource.onerror = (error) => {
-        console.error('[MonitoringStore] SSE error:', error)
-        set({ 
-          connected: false,
-          reconnecting: true
-        })
-        
-        // EventSource se reconecta automáticamente
-        // No necesitamos hacer nada especial aquí
-      }
-      
-    } catch (error) {
-      console.error('[MonitoringStore] Error creating SSE connection:', error)
-      set({ 
-        connected: false,
-        reconnecting: false
-      })
-    }
+    console.log('[MonitoringStore] Starting polling...')
+    
+    const interval = setInterval(() => {
+      get().loadInitialState()
+    }, POLL_INTERVAL)
+    
+    set({ pollingInterval: interval })
   },
   
   /**
-   * Desconecta del stream SSE
+   * Detiene el polling
    */
-  disconnectSSE: () => {
-    const { eventSource } = get()
-    if (eventSource) {
-      console.log('[MonitoringStore] Disconnecting SSE...')
-      eventSource.close()
-      set({ 
-        eventSource: null, 
-        connected: false,
-        reconnecting: false
-      })
+  stopPolling: () => {
+    const { pollingInterval } = get()
+    if (pollingInterval) {
+      console.log('[MonitoringStore] Stopping polling...')
+      clearInterval(pollingInterval)
+      set({ pollingInterval: null })
     }
   },
   
@@ -238,15 +175,11 @@ const useMonitoringStore = create((set, get) => ({
   },
   
   /**
-   * Inicializa el store: carga estado inicial e inicia  polling
+   * Inicializa el store
    */
   initialize: async () => {
     console.log('[MonitoringStore] Initializing...')
-    
-    // 1. Cargar estado inicial
     await get().loadInitialState()
-    
-    // 2. Iniciar polling para updates
     get().startPolling()
   },
   
