@@ -1,17 +1,8 @@
 import axios from 'axios'
 
-// Configurar baseURL según el entorno
-const getBaseURL = () => {
-  // En producción, usar variable de entorno o URL relativa
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL
-  }
-  // En desarrollo local, usar proxy de Vite
-  return '/api'
-}
-
+// En Vercel, todo está en el mismo dominio, usar rutas relativas
 const api = axios.create({
-  baseURL: getBaseURL(),
+  baseURL: '/api',
   timeout: 10000,
   withCredentials: true, // Enviar cookies de sesión
 })

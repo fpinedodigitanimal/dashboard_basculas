@@ -1,28 +1,25 @@
 /**
  * Store de Monitorización de Básculas
- * Gestiona el estado de activación de alertas con sincronización en tiempo real vía SSE
+ * Gestiona el estado de activación de alertas con sincronización mediante polling
+ * (Adaptado para Vercel serverless - sin SSE)
  */
 
 import { create } from 'zustand'
 
+const POLL_INTERVAL = 5000 // 5 segundos
+
 const useMonitoringStore = create((set, get) => ({
   // ===================== DOMAIN STATE =====================
   // Mapa de estado de monitorización: Map<scale_id, MonitoringState>
-  // MonitoringState: { scale_id, enabled, updated_at, updated_by, version }
   monitoring: new Map(),
   
   // ===================== UI STATE =====================
-  // Básulas siendo actualizadas (por scale_id)
   loading: new Set(),
-  
-  // Errores por báscula: Map<scale_id, error_message>
   errors: new Map(),
   
-  // ===================== SSE STATE =====================
-  eventSource: null,
-  connected: false,
-  reconnecting: false,
-  lastHeartbeat: null,
+  // ===================== POLLING STATE =====================
+  pollingInterval: null,
+  lastUpdate: null,
   
   // ===================== ACCIONES DE DOMINIO =====================
   
@@ -222,25 +219,26 @@ const useMonitoringStore = create((set, get) => ({
    */
   loadInitialState: async () => {
     try {
-      console.log('[MonitoringStore] Loading initial state...')
+      console.log('[MonitoringStore] Loading state...')
       
       const response = await fetch('/api/scales/monitoring')
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`)
       }
       
-      const { monitoring } = await response.json()
+      const monitoring = await response.json()
       
       console.log(`[MonitoringStore] Loaded ${monitoring.length} monitoring states`)
       get().setMonitoringBulk(monitoring)
+      set({ lastUpdate: new Date().toISOString() })
       
     } catch (error) {
-      console.error('[MonitoringStore] Error loading initial state:', error)
+      console.error('[MonitoringStore] Error loading state:', error)
     }
   },
   
   /**
-   * Inicializa el store: carga estado inicial y conecta SSE
+   * Inicializa el store: carga estado inicial e inicia  polling
    */
   initialize: async () => {
     console.log('[MonitoringStore] Initializing...')
@@ -248,21 +246,21 @@ const useMonitoringStore = create((set, get) => ({
     // 1. Cargar estado inicial
     await get().loadInitialState()
     
-    // 2. Conectar SSE para updates en tiempo real
-    get().connectSSE()
+    // 2. Iniciar polling para updates
+    get().startPolling()
   },
   
   /**
-   * Limpia el store (para testing o cleanup)
+   * Limpia el store
    */
   cleanup: () => {
     console.log('[MonitoringStore] Cleaning up...')
-    get().disconnectSSE()
+    get().stopPolling()
     set({
       monitoring: new Map(),
       loading: new Set(),
       errors: new Map(),
-      lastHeartbeat: null
+      lastUpdate: null
     })
   }
 }))
