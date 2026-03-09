@@ -92,16 +92,23 @@ export default function DataTable({ data, filter = 'all' }) {
             {filteredData.length > 0 ? (
               filteredData.map((row, idx) => {
                 const scaleId = row.scale_id || row.nombre
+                // Manejar diferentes formatos de peso
+                const weight = row.weight !== undefined && row.weight !== null 
+                  ? `${Number(row.weight).toFixed(1)} kg` 
+                  : '-'
+                // Manejar diferentes formatos de fecha
+                const fecha = row.created_at || row.ultimoPesaje || '-'
+                
                 return (
                   <tr key={scaleId || idx} className="hover:bg-gray-50 dark-mode:hover:bg-gray-800 transition-colors">
                     <td className="px-2 sm:px-3 py-2 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 dark-mode:text-gray-100">
                       {scaleId}
                     </td>
                     <td className="px-2 sm:px-3 py-2 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark-mode:text-gray-200">
-                      {row.weight ? `${row.weight} kg` : '-'}
+                      {weight}
                     </td>
                     <td className="px-2 sm:px-3 py-2 whitespace-nowrap text-xs sm:text-sm text-gray-500 dark-mode:text-gray-400">
-                      {row.created_at || row.ultimoPesaje || '-'}
+                      {fecha}
                     </td>
                     <td className="px-2 sm:px-3 py-2 whitespace-nowrap text-center">
                       <MonitoringToggle scaleId={scaleId} size="small" />
