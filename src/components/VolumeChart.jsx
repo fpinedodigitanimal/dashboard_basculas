@@ -1,8 +1,44 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { useEffect, useState } from 'react'
 
+// Tooltip personalizado que solo muestra la serie activa
+const CustomTooltip = ({ active, payload, label, activeDataKey, isDarkMode }) => {
+  if (!active || !payload || payload.length === 0) return null
+
+  // Filtrar solo la serie activa
+  const filteredPayload = activeDataKey
+    ? payload.filter(p => p.dataKey === activeDataKey)
+    : []
+
+  if (filteredPayload.length === 0) return null
+
+  const tooltipBg = isDarkMode ? '#2A2A2A' : '#fff'
+  const tooltipBorder = isDarkMode ? '#444' : '#e5e7eb'
+  const tooltipText = isDarkMode ? '#FFFFFF' : '#000000'
+
+  return (
+    <div style={{
+      backgroundColor: tooltipBg,
+      border: `1px solid ${tooltipBorder}`,
+      borderRadius: '0.5rem',
+      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+      fontSize: '11px',
+      color: tooltipText,
+      padding: '8px 12px'
+    }}>
+      <p style={{ margin: 0, marginBottom: '4px', fontWeight: '600' }}>{label}</p>
+      {filteredPayload.map((entry, index) => (
+        <p key={index} style={{ margin: 0, color: entry.color }}>
+          Báscula {entry.name}: {entry.value} registros
+        </p>
+      ))}
+    </div>
+  )
+}
+
 export default function VolumeChart({ data, filter = 'all' }) {
   const [isDarkMode, setIsDarkMode] = useState(false)
+  const [activeDataKey, setActiveDataKey] = useState(null)
 
   useEffect(() => {
     // Detectar modo oscuro
@@ -123,16 +159,7 @@ export default function VolumeChart({ data, filter = 'all' }) {
               width={40}
               label={{ value: 'Registros', angle: -90, position: 'insideLeft', style: { fontSize: 10, fill: axisColor } }}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: tooltipBg,
-                border: `1px solid ${tooltipBorder}`,
-                borderRadius: '0.5rem',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                fontSize: '11px',
-                color: tooltipText
-              }}
-            />
+            <Tooltip content={<CustomTooltip activeDataKey={activeDataKey} isDarkMode={isDarkMode} />} />
             <Legend 
               wrapperStyle={{ fontSize: '11px', color: axisColor }}
               iconType="line"
@@ -150,6 +177,8 @@ export default function VolumeChart({ data, filter = 'all' }) {
                   activeDot={{ r: 6 }}
                   name={scale.scale_id}
                   opacity={isTop ? 1 : 0.85}
+                  onMouseEnter={() => setActiveDataKey(scale.scale_id)}
+                  onMouseLeave={() => setActiveDataKey(null)}
                 />
               )
             })}

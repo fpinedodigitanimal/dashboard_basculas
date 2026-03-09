@@ -1,7 +1,38 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { useState } from 'react'
+
+// Tooltip personalizado que solo muestra la serie activa
+const CustomTooltip = ({ active, payload, label, activeDataKey }) => {
+  if (!active || !payload || payload.length === 0) return null
+
+  // Filtrar solo la serie activa o las que están muy cerca
+  const filteredPayload = activeDataKey
+    ? payload.filter(p => p.dataKey === activeDataKey)
+    : payload
+
+  if (filteredPayload.length === 0) return null
+
+  return (
+    <div style={{
+      backgroundColor: '#fff',
+      border: '1px solid #e5e7eb',
+      borderRadius: '0.5rem',
+      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+      padding: '8px 12px'
+    }}>
+      <p style={{ margin: 0, marginBottom: '4px', fontWeight: '600' }}>{label}</p>
+      {filteredPayload.map((entry, index) => (
+        <p key={index} style={{ margin: 0, color: entry.color }}>
+          {entry.name}: {entry.value}
+        </p>
+      ))}
+    </div>
+  )
+}
 
 export default function ActivityChart({ data }) {
   const chartData = data || []
+  const [activeDataKey, setActiveDataKey] = useState(null)
 
   return (
     <div className="card">
@@ -20,14 +51,7 @@ export default function ActivityChart({ data }) {
               tick={{ fontSize: 12 }}
               stroke="#9ca3af"
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#fff',
-                border: '1px solid #e5e7eb',
-                borderRadius: '0.5rem',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-              }}
-            />
+            <Tooltip content={<CustomTooltip activeDataKey={activeDataKey} />} />
             <Legend 
               wrapperStyle={{ fontSize: '14px' }}
               iconType="line"
@@ -40,6 +64,8 @@ export default function ActivityChart({ data }) {
               dot={{ fill: '#0ea5e9', r: 4 }}
               activeDot={{ r: 6 }}
               name="Pesajes"
+              onMouseEnter={() => setActiveDataKey('pesajes')}
+              onMouseLeave={() => setActiveDataKey(null)}
             />
             <Line
               type="monotone"
@@ -49,6 +75,8 @@ export default function ActivityChart({ data }) {
               dot={{ fill: '#10b981', r: 4 }}
               activeDot={{ r: 6 }}
               name="Básculas Activas"
+              onMouseEnter={() => setActiveDataKey('activas')}
+              onMouseLeave={() => setActiveDataKey(null)}
             />
           </LineChart>
         </ResponsiveContainer>

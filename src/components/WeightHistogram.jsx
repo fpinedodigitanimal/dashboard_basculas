@@ -1,8 +1,44 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { useEffect, useState } from 'react'
 
+// Tooltip personalizado que solo muestra la serie activa
+const CustomTooltip = ({ active, payload, label, activeDataKey, isDarkMode }) => {
+  if (!active || !payload || payload.length === 0) return null
+
+  // Filtrar solo la serie activa
+  const filteredPayload = activeDataKey
+    ? payload.filter(p => p.dataKey === activeDataKey)
+    : []
+
+  if (filteredPayload.length === 0) return null
+
+  const tooltipBg = isDarkMode ? '#2A2A2A' : '#fff'
+  const tooltipBorder = isDarkMode ? '#444' : '#e5e7eb'
+  const tooltipText = isDarkMode ? '#FFFFFF' : '#000000'
+
+  return (
+    <div style={{
+      backgroundColor: tooltipBg,
+      border: `1px solid ${tooltipBorder}`,
+      borderRadius: '0.5rem',
+      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+      fontSize: '10px',
+      color: tooltipText,
+      padding: '8px 12px'
+    }}>
+      <p style={{ margin: 0, marginBottom: '4px', fontWeight: '600' }}>{label} kg</p>
+      {filteredPayload.map((entry, index) => (
+        <p key={index} style={{ margin: 0, color: entry.color }}>
+          Báscula {entry.name}: {entry.value} pesajes
+        </p>
+      ))}
+    </div>
+  )
+}
+
 export default function WeightHistogram({ data, filter = 'all' }) {
   const [isDarkMode, setIsDarkMode] = useState(false)
+  const [activeDataKey, setActiveDataKey] = useState(null)
 
   useEffect(() => {
     // Detectar modo oscuro
@@ -131,16 +167,7 @@ export default function WeightHistogram({ data, filter = 'all' }) {
               stroke={axisColor}
               width={30}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: tooltipBg,
-                border: `1px solid ${tooltipBorder}`,
-                borderRadius: '0.5rem',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                fontSize: '10px',
-                color: tooltipText
-              }}
-            />
+            <Tooltip content={<CustomTooltip activeDataKey={activeDataKey} isDarkMode={isDarkMode} />} />
             <Legend 
               wrapperStyle={{ fontSize: '9px', color: axisColor }}
               iconType="line"
@@ -156,6 +183,8 @@ export default function WeightHistogram({ data, filter = 'all' }) {
                 fill={`url(#color-${scale.scale_id})`}
                 fillOpacity={0.6}
                 name={scale.scale_id}
+                onMouseEnter={() => setActiveDataKey(scale.scale_id)}
+                onMouseLeave={() => setActiveDataKey(null)}
               />
             ))}
           </AreaChart>
