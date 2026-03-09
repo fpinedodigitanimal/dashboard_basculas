@@ -6,6 +6,7 @@ Adaptado del backend Flask para funcionar como funciones serverless
 
 import os
 import json
+import random
 from datetime import date, timedelta, datetime
 from flask import Flask, jsonify, request, session
 from flask_cors import CORS
@@ -97,57 +98,67 @@ def auth_status():
 def get_dashboard():
     """Datos del dashboard (DEMO MODE)"""
     
-    # Generar datos para los últimos 30 días
     today = datetime.now()
     
-    volume30d = []
-    for i in range(30, 0, -1):
-        day = today - timedelta(days=i)
-        volume30d.append({
-            'date': day.strftime('%Y-%m-%d'),
-            'total': 120 + (i % 20),
-            'B-001': 15 + (i % 5),
-            'B-002': 12 + (i % 4),
-            'B-003': 10 + (i % 3),
-            'B-004': 18 + (i % 6),
-            'B-005': 14 + (i % 4),
-            'B-006': 16 + (i % 5),
-            'B-007': 11 + (i % 3),
-            'B-008': 13 + (i % 4),
+    # Lista de básculas
+    scale_ids = ['B-001', 'B-002', 'B-003', 'B-004', 'B-005', 'B-006', 'B-007', 'B-008']
+    
+    # ==== VOLUME30D DATA ====
+    # Estructura: [{scale_id, total, data: [{fecha, registros}]}]
+    volume30d_data = []
+    for scale_id in scale_ids:
+        daily_data = []
+        total_registros = 0
+        for i in range(30, 0, -1):
+            day = today - timedelta(days=i)
+            registros = 10 + (int(scale_id.split('-')[1]) + i) % 15
+            total_registros += registros
+            daily_data.append({
+                'fecha': day.strftime('%d %b'),
+                'registros': registros
+            })
+        
+        volume30d_data.append({
+            'scale_id': scale_id,
+            'total': total_registros,
+            'data': daily_data
         })
     
-    # Datos de heatmap (día de semana vs hora)
+    # ==== HEATMAP DATA ====
+    # Estructura: [{scale_id, hourly: [24 valores]}]
     heatmap_data = []
-    days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-    for day_idx, day in enumerate(days):
+    for scale_id in scale_ids:
+        # Generar 24 valores (uno por hora)
+        hourly_values = []
         for hour in range(24):
-            # Más actividad entre 8-18h, menos en fines de semana
-            base_value = 10 if day_idx < 5 else 3
-            peak_multiplier = 2 if 8 <= hour <= 18 else 0.3
-            heatmap_data.append({
-                'day': day,
-                'hour': f'{hour:02d}:00',
-                'value': int(base_value * peak_multiplier * (1 + (hour % 3) * 0.5))
-            })
+            # Más actividad entre 8-18h
+            base_value = 15 if 8 <= hour <= 18 else 3
+            value = base_value + random.randint(-5, 5)
+            hourly_values.append(max(0, value))
+        
+        heatmap_data.append({
+            'scale_id': scale_id,
+            'hourly': hourly_values
+        })
     
-    # Datos de histograma de pesos
+    # ==== HISTOGRAM DATA ====
+    # Estructura: [{scale_id, weights: [array de pesos]}]
     histogram_data = []
-    weight_ranges = [
-        (300, 350), (350, 400), (400, 450), (450, 500),
-        (500, 550), (550, 600), (600, 650), (650, 700),
-        (700, 750), (750, 800)
-    ]
-    for min_w, max_w in weight_ranges:
-        # Distribución normal centrada en 600kg
-        center = 600
-        distance = abs((min_w + max_w) / 2 - center)
-        count = int(50 * (1 - distance / 300))
-        if count > 0:
-            histogram_data.append({
-                'range': f'{min_w}-{max_w}',
-                'count': count,
-                'weight': (min_w + max_w) / 2
-            })
+    for scale_id in scale_ids:
+        # Generar array de pesos con distribución normal centrada en 600kg
+        weights = []
+        num_weights = 50 + random.randint(-10, 10)
+        for _ in range(num_weights):
+            # Distribución normal: media=600, desv_std=80
+            weight = random.gauss(600, 80)
+            # Limitar entre 300-900kg
+            weight = max(300, min(900, weight))
+            weights.append(round(weight, 1))
+        
+        histogram_data.append({
+            'scale_id': scale_id,
+            'weights': weights
+        })
     
     # Estructura que el frontend espera
     dashboard_data = {
@@ -189,7 +200,7 @@ def get_dashboard():
             {'nombre': 'B-007', 'estado': 'desconectado', 'ultimoPesaje': '-', 'totalHoy': 0, 'rfid': '-'},
             {'nombre': 'B-008', 'estado': 'conectado', 'ultimoPesaje': '10:30', 'totalHoy': 21, 'rfid': 'P7Q8R9'},
         ],
-        'volume30dData': volume30d,
+        'volume30dData': volume30d_data,
         'heatmapData': heatmap_data,
         'histogramData': histogram_data,
     }
