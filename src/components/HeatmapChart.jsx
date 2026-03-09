@@ -60,7 +60,7 @@ export default function HeatmapChart({ data, filter = 'all', selectedDate }) {
     return (
       <div className="card bg-white">
         <div className="card-header">Heatmap de Registros por Hora</div>
-        <div className="h-[450px] flex items-center justify-center text-gray-400">
+        <div className="h-[250px] sm:h-[350px] lg:h-[450px] flex items-center justify-center text-gray-400">
           Sin datos disponibles
         </div>
       </div>

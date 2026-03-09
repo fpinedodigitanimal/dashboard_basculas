@@ -71,12 +71,12 @@ export default function KPICards() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 mb-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2 mb-2 sm:mb-3">
         {[...Array(5)].map((_, i) => (
           <div key={i} className="bg-white dark:bg-[#1E1E1E] rounded-lg p-2 animate-pulse">
-            <div className="h-6 w-6 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
-            <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            <div className="h-5 sm:h-6 w-5 sm:w-6 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
+            <div className="h-2 sm:h-3 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
+            <div className="h-4 sm:h-5 bg-gray-200 dark:bg-gray-700 rounded"></div>
           </div>
         ))}
       </div>
@@ -84,21 +84,21 @@ export default function KPICards() {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 mb-2">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2 mb-2 sm:mb-3">
       {cards.map((card, idx) => {
         const Icon = card.icon
         return (
           <div
             key={idx}
-            className="bg-white dark:bg-[#1E1E1E] rounded-lg p-2 border border-gray-200 dark:border-[#2A2A2A] hover:shadow-lg transition-shadow"
+            className="bg-white dark:bg-[#1E1E1E] rounded-lg p-1.5 sm:p-2 border border-gray-200 dark:border-[#2A2A2A] hover:shadow-lg transition-shadow"
           >
-            <div className={`w-7 h-7 ${card.bgColor} rounded-lg flex items-center justify-center mb-1.5`}>
-              <Icon className={card.color} size={16} strokeWidth={2} />
+            <div className={`w-6 sm:w-7 h-6 sm:h-7 ${card.bgColor} rounded-lg flex items-center justify-center mb-1 sm:mb-1.5`}>
+              <Icon className={card.color} strokeWidth={2} />
             </div>
-            <div className="text-[10px] text-gray-600 dark:text-[#B3B3B3] mb-0.5">
+            <div className="text-[9px] sm:text-[10px] text-gray-600 dark:text-[#B3B3B3] mb-0.5">
               {card.label}
             </div>
-            <div className={`text-lg font-bold ${card.color}`}>
+            <div className={`text-base sm:text-lg font-bold ${card.color} truncate`}>
               {card.value}{card.suffix || ''}
             </div>
           </div>

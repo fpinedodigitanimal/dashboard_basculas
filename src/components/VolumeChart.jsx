@@ -58,7 +58,7 @@ export default function VolumeChart({ data, filter = 'all' }) {
     return (
       <div className="card">
         <div className="card-header">Actividad últimos 30 días por Báscula</div>
-        <div className="h-[300px] flex items-center justify-center text-gray-400">
+        <div className="h-[250px] sm:h-[350px] lg:h-[450px] flex items-center justify-center text-gray-400">
           Sin datos disponibles
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function VolumeChart({ data, filter = 'all' }) {
     return (
       <div className="card">
         <div className="card-header">Actividad últimos 30 días por Báscula</div>
-        <div className="h-[450px] flex items-center justify-center text-gray-400">
+        <div className="h-[250px] sm:h-[350px] lg:h-[450px] flex items-center justify-center text-gray-400">
           No hay básculas en el grupo seleccionado
         </div>
       </div>
@@ -138,12 +138,12 @@ export default function VolumeChart({ data, filter = 'all' }) {
     <div className="card">
       <div className="card-header">
         Actividad últimos 30 días por Báscula
-        <span className="text-sm font-normal text-gray-500 ml-2">
+        <span className="text-xs sm:text-sm font-normal text-gray-500 ml-2">
           (destacadas las 5 más activas)
         </span>
       </div>
       
-      <div className="h-[450px]">
+      <div className="h-[250px] sm:h-[350px] lg:h-[450px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />

@@ -58,7 +58,7 @@ export default function WeightHistogram({ data, filter = 'all' }) {
     return (
       <div className="card">
         <div className="card-header">Distribución de Pesos</div>
-        <div className="h-[300px] flex items-center justify-center text-gray-400">
+        <div className="h-[250px] sm:h-[350px] lg:h-[450px] flex items-center justify-center text-gray-400">
           Sin datos disponibles
         </div>
       </div>
@@ -95,7 +95,7 @@ export default function WeightHistogram({ data, filter = 'all' }) {
     return (
       <div className="card">
         <div className="card-header">Distribución de Pesos entre Básculas</div>
-        <div className="h-[450px] flex items-center justify-center text-gray-400">
+        <div className="h-[250px] sm:h-[350px] lg:h-[450px] flex items-center justify-center text-gray-400">
           No hay datos en el rango válido (≤ 1000kg)
         </div>
       </div>
@@ -141,7 +141,7 @@ export default function WeightHistogram({ data, filter = 'all' }) {
     <div className="card">
       <div className="card-header text-sm">Distribución de Pesos</div>
       
-      <div className="h-[450px]">
+      <div className="h-[250px] sm:h-[350px] lg:h-[450px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -5, bottom: 5 }}>
             <defs>
