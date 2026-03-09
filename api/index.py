@@ -14,7 +14,18 @@ from flask_cors import CORS
 from functools import wraps
 
 # Importar módulo labs2 para acceso a datos reales
-import labs2
+try:
+    import labs2
+    LABS2_AVAILABLE = True
+except Exception as e:
+    print(f"[WARNING] No se pudo importar labs2: {e}")
+    LABS2_AVAILABLE = False
+    # Crear un módulo labs2 dummy para evitar errores
+    class DummyLabs2:
+        @staticmethod
+        def get_table_data(*args, **kwargs):
+            return pd.DataFrame(columns=["created_at", "scale_id", "weight", "epc"])
+    labs2 = DummyLabs2()
 
 # Crear app Flask
 app = Flask(__name__)
@@ -128,7 +139,33 @@ def get_bascula_data():
 @app.route('/api/health', methods=['GET'])
 def health():
     """Health check endpoint"""
-    return jsonify({'status': 'ok', 'mode': 'real-data', 'timestamp': datetime.now().isoformat()}), 200
+    return jsonify({
+        'status': 'ok', 
+        'mode': 'real-data' if LABS2_AVAILABLE else 'fallback',
+        'timestamp': datetime.now().isoformat(),
+        'labs2_available': LABS2_AVAILABLE
+    }), 200
+
+# ==================== ERROR HANDLERS ====================
+
+@app.errorhandler(404)
+def not_found(error):
+    """Manejar 404 con JSON"""
+    return jsonify({'error': 'Endpoint no encontrado'}), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    """Manejar errores 500 con JSON"""
+    print(f"[ERROR 500] {error}")
+    return jsonify({'error': 'Error interno del servidor', 'message': str(error)}), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    """Manejar todas las excepciones no capturadas"""
+    print(f"[EXCEPTION] {e}")
+    import traceback
+    traceback.print_exc()
+    return jsonify({'error': 'Error inesperado', 'message': str(e)}), 500
 
 # ==================== AUTENTICACIÓN ====================
 
@@ -482,7 +519,8 @@ def get_remoteiot_status():
 
 # ==================== HANDLER PARA VERCEL ====================
 
-# Vercel handler
-def handler(event, context):
-    """Handler para Vercel Serverless"""
-    return app(event, context)
+# Exportar app para Vercel (WSGI)
+# Vercel espera que el objeto WSGI app se llame 'app'
+if __name__ == '__main__':
+    app.run(debug=True)
+
