@@ -15,6 +15,7 @@ export default function KPICards({ authenticated = false }) {
   useEffect(() => {
     // Solo cargar KPIs si está autenticado
     if (!authenticated) {
+      setLoading(false)
       return
     }
 

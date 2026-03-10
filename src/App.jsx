@@ -25,12 +25,16 @@ function App() {
   const [filter, setFilter] = useState('all')
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const { isDarkMode, toggleTheme } = useTheme()
-  
+
   // Obtener estado de autenticación
   const { authenticated } = useAuth()
 
   // Inicializar sistema de monitorización SOLO si está autenticado
-  const { connected, reconnecting, isInitialized: isMonitoringInitialized } = useMonitoringSync(authenticated)
+  const {
+    connected,
+    reconnecting,
+    isInitialized: isMonitoringInitialized,
+  } = useMonitoringSync(authenticated)
   const getEnabledScales = useMonitoringStore((state) => state.getEnabledScales)
   const monitoring = useMonitoringStore((state) => state.monitoring)
 
@@ -244,7 +248,9 @@ function App() {
 
         <main className="flex-1 overflow-y-auto max-w-full mx-auto px-2 sm:px-4 lg:px-8 py-2 sm:py-3">
           {/* KPI Cards */}
-        <KPICards authenticated={authenticated} />
+          <KPICards authenticated={authenticated} />
+
+          {loading && !data ? (
             <LoadingSpinner size="xl" className="h-64" />
           ) : (
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-2 sm:gap-3 lg:gap-4 animate-fade-in">
