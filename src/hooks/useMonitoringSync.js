@@ -6,7 +6,7 @@
 import { useEffect } from 'react'
 import useMonitoringStore from '../stores/monitoringStore'
 
-export function useMonitoringSync() {
+export function useMonitoringSync(authenticated = false) {
   const initialize = useMonitoringStore((state) => state.initialize)
   const cleanup = useMonitoringStore((state) => state.cleanup)
   const connected = useMonitoringStore((state) => state.connected)
@@ -14,6 +14,11 @@ export function useMonitoringSync() {
   const isInitialized = useMonitoringStore((state) => state.isInitialized)
 
   useEffect(() => {
+    // Solo inicializar si el usuario está autenticado
+    if (!authenticated) {
+      return
+    }
+
     // Inicializar el store (carga estado inicial + conecta SSE)
     initialize()
 
@@ -21,7 +26,7 @@ export function useMonitoringSync() {
     return () => {
       cleanup()
     }
-  }, [initialize, cleanup]) // Incluir dependencias
+  }, [authenticated, initialize, cleanup]) // Incluir authenticated en dependencias
 
   return {
     connected,
