@@ -556,17 +556,20 @@ def get_kpis():
         last_7d = now - pd.Timedelta(days=7)
         active_scales = df[df['created_at'] >= last_7d]['scale_id'].nunique()
         
-        # 2. Animales monitorizados (EPCs únicos en últimos 7 días)
+        # 2. Animales monitorizados (EPCs únicos hasta ayer - últimos 7 días sin incluir hoy)
+        # Excluimos el día actual para evitar variabilidad durante el día
         total_animals = df[
             (df['created_at'] >= last_7d) & 
+            (df['created_at'] < today) & 
             (df['epc'].notna()) & 
             (df['epc'] != '') & 
             (df['epc'] != 'Unknown')
         ]['epc'].nunique()
         
-        # 3. Registros por hora (media últimas 24h)
-        df_24h = df[df['created_at'] >= last_24h]
-        records_per_hour = len(df_24h) / 24.0 if len(df_24h) > 0 else 0
+        # 3. Registros por hora (promedio del día de ayer completo)
+        # Usamos solo ayer para evitar variabilidad del día actual
+        df_yesterday = df[(df['created_at'] >= yesterday) & (df['created_at'] < today)]
+        records_per_hour = len(df_yesterday) / 24.0 if len(df_yesterday) > 0 else 0
         
         # 4. Tendencia de actividad (ayer vs anteayer - días completos)
         # No se incluye hoy porque es un día incompleto

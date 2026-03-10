@@ -409,23 +409,23 @@ def get_kpis():
         # Calcular KPIs
         today = date.today()
         df['date'] = df['created_at'].dt.date
-        today_data = df[df['date'] == today]
+        yesterday = today - timedelta(days=1)
+        yesterday_data = df[df['date'] == yesterday]
         
-        # Registros por hora (promedio del día de hoy)
-        if not today_data.empty:
-            hours_elapsed = (datetime.now() - datetime.now().replace(hour=0, minute=0, second=0)).total_seconds() / 3600
-            records_per_hour = len(today_data) / max(hours_elapsed, 1)
+        # Registros por hora (promedio del día de ayer completo)
+        # Usamos solo ayer para evitar variabilidad del día actual
+        if not yesterday_data.empty:
+            records_per_hour = len(yesterday_data) / 24.0
         else:
             records_per_hour = 0
         
-        # Animales únicos (EPCs únicos del día)
-        total_animals = today_data['epc'].nunique() if not today_data.empty else 0
+        # Animales únicos (EPCs únicos de ayer)
+        # Excluimos el día actual para evitar variabilidad durante el día
+        total_animals = yesterday_data['epc'].nunique() if not yesterday_data.empty else 0
         
         # Tendencia de actividad (ayer vs anteayer - días completos)
         # No se incluye hoy porque es un día incompleto
-        yesterday = today - timedelta(days=1)
         day_before_yesterday = today - timedelta(days=2)
-        yesterday_data = df[df['date'] == yesterday]
         day_before_data = df[df['date'] == day_before_yesterday]
         
         if len(day_before_data) > 0:
