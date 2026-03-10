@@ -55,9 +55,9 @@ Vercel detectará automáticamente la configuración desde `vercel.json`:
 En **Settings → Environment Variables**, puedes añadir:
 
 ```env
-# Credenciales de admin (opcional, por defecto admin/admin)
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=tu-password-seguro
+# Credenciales de admin (opcional, por defecto digitanimal/digibasculas)
+ADMIN_USERNAME=digitanimal
+ADMIN_PASSWORD=digibasculas
 
 # Clave secreta para sesiones (recomendado cambiar)
 SECRET_KEY=genera-clave-aleatoria-aqui

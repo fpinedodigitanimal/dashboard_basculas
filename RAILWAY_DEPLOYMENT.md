@@ -32,8 +32,8 @@ En Railway, ve a tu proyecto → **Variables**:
 
 ```env
 DEMO_MODE=1
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=admin
+ADMIN_USERNAME=digitanimal
+ADMIN_PASSWORD=digibasculas
 PORT=8050
 SECRET_KEY=genera-una-clave-secreta-aleatoria-aqui
 ALLOWED_ORIGINS=https://tu-app.vercel.app,http://localhost:3000

@@ -38,8 +38,8 @@ Edita el archivo `.env` y configura las credenciales:
 
 ```env
 # Autenticación
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=admin
+ADMIN_USERNAME=digitanimal
+ADMIN_PASSWORD=digibasculas
 SECRET_KEY=cambia-esta-clave-secreta-en-produccion
 ```
 
@@ -47,8 +47,8 @@ SECRET_KEY=cambia-esta-clave-secreta-en-produccion
 
 ### 2. Credenciales por Defecto
 
-- **Usuario**: `admin`
-- **Contraseña**: `admin`
+- **Usuario**: `digitanimal`
+- **Contraseña**: `digibasculas`
 
 ## Seguridad
 
@@ -121,8 +121,8 @@ BASCULAS_DATA_REFRESH_MS=100000
 BASCULAS_CACHE_DIR=./cache
 
 # Autenticación
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=admin
+ADMIN_USERNAME=digitanimal
+ADMIN_PASSWORD=digibasculas
 SECRET_KEY=tu-clave-secreta-super-segura-cambiala-en-produccion
 ```
 

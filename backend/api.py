@@ -75,8 +75,8 @@ except ImportError:
     pass
 
 # Configuración de autenticación
-ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'admin')
-ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'admin')
+ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'digitanimal')
+ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'digibasculas')
 
 # Decorador para proteger rutas que requieren autenticación
 def login_required(f):
