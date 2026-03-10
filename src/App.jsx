@@ -254,17 +254,17 @@ function App() {
             
             {/* Columna derecha: Tablas apiladas */}
             <div className="xl:col-span-2 flex flex-col gap-2 sm:gap-3 lg:gap-4">
-              {/* Panel Monitorización */}
-              <DataTable 
-                data={data?.tableData} 
-                filter={filter}
-              />
-              
               {/* Tabla de Alertas */}
               <AlertsPanel 
                 alerts={alerts} 
                 onDismiss={dismissAlert}
                 hasSelectedScales={getEnabledScales().length > 0}
+              />
+              
+              {/* Panel Monitorización */}
+              <DataTable 
+                data={data?.tableData} 
+                filter={filter}
               />
             </div>
             
