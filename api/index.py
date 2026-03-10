@@ -339,7 +339,10 @@ def get_dashboard():
                 last_weight = scale_df.iloc[-1]
                 
                 table_data.append({
+                    'scale_id': scale_id,
                     'nombre': scale_id,
+                    'weight': float(last_weight['weight']) if pd.notna(last_weight['weight']) else None,
+                    'created_at': last_weight['created_at'].strftime('%Y-%m-%d %H:%M:%S') if pd.notna(last_weight['created_at']) else None,
                     'estado': 'conectado' if not today_scale.empty else 'desconectado',
                     'ultimoPesaje': last_weight['created_at'].strftime('%H:%M') if pd.notna(last_weight['created_at']) else '-',
                     'totalHoy': len(today_scale),

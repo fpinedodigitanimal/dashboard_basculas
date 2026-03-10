@@ -53,7 +53,7 @@ export default function DataTable({ data, filter = 'all' }) {
   }
 
   return (
-    <div className="card flex flex-col h-full">
+    <div className={`card flex flex-col ${isCollapsed ? '' : 'h-full'}`}>
       <div className="card-header mb-0 py-2">
         <div className="flex items-center justify-between">
           <div className="flex-1">
