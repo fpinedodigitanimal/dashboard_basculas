@@ -196,12 +196,13 @@ const useMonitoringStore = create((set, get) => ({
   cleanup: () => {
     console.log('[MonitoringStore] Cleaning up...')
     get().stopPolling()
+    // NO resetear isInitialized para evitar problemas con StrictMode
     set({
       monitoring: new Map(),
       loading: new Set(),
       errors: new Map(),
       lastUpdate: null,
-      isInitialized: false,
+      // isInitialized mantiene su valor
     })
   },
 }))

@@ -26,10 +26,9 @@ function App() {
   const { isDarkMode, toggleTheme } = useTheme()
 
   // Inicializar sistema de monitorización
-  const { connected, reconnecting } = useMonitoringSync()
+  const { connected, reconnecting, isInitialized: isMonitoringInitialized } = useMonitoringSync()
   const getEnabledScales = useMonitoringStore((state) => state.getEnabledScales)
   const monitoring = useMonitoringStore((state) => state.monitoring)
-  const isMonitoringInitialized = useMonitoringStore((state) => state.isInitialized)
 
   const filterAlertsBySelection = useCallback((allAlerts, enabledScales, isInitialized) => {
     // Si el sistema de monitorización aún no se ha inicializado, mostrar todas las alertas
@@ -99,9 +98,12 @@ function App() {
   const isToday = selectedDate === new Date().toISOString().split('T')[0]
 
   // Cargar datos cuando cambia la fecha o al montar el componente
+  // IMPORTANTE: Solo cargar después de que el sistema de monitorización esté inicializado
   useEffect(() => {
-    loadData()
-  }, [loadData])
+    if (isMonitoringInitialized) {
+      loadData()
+    }
+  }, [loadData, isMonitoringInitialized])
 
   // Auto-refresh cada 60s (solo si estamos en "hoy")
   useEffect(() => {
