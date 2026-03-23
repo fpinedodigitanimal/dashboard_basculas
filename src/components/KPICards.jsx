@@ -1,4 +1,4 @@
-import { Activity, Scale, Users, TrendingUp, AlertTriangle } from 'lucide-react'
+import { Activity, Scale, Cow, TrendingUp, AlertTriangle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { getKPIs } from '../services/api'
 
@@ -44,7 +44,7 @@ export default function KPICards({ authenticated = false }) {
       bgColor: 'bg-blue-100 dark:bg-blue-900/20',
     },
     {
-      icon: Users,
+      icon: Cow,
       label: 'Animales Monitorizados',
       value: kpis.totalAnimals,
       color: 'text-green-600 dark:text-green-400',
