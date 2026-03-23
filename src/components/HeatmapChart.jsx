@@ -32,7 +32,9 @@ export default function HeatmapChart({ data, filter = 'all', selectedDate }) {
     'B00012': 'Algortola',
     'B00034': 'Rubén',
     'B00063': 'Ganademad',
-    'B00027': 'Sierra San Pedro'
+    'B00027': 'Sierra San Pedro',
+    'B00078': 'Sin Grupo',
+    'B00079': 'Sin Grupo'
   }
 
   // Función para obtener el grupo de una báscula

@@ -159,7 +159,9 @@ def generate_demo_data():
         'B00063': 'Ganademad',
         'B00064': 'Larriaundi',
         'B00065': 'COVAP',
-        'B00066': 'COVAP'
+        'B00066': 'COVAP',
+        'B00078': 'Sin Grupo',
+        'B00079': 'Sin Grupo'
     }
     
     # Generar 30 días de datos
@@ -448,7 +450,12 @@ def get_dashboard_data():
             last_48h_df['hour'] = last_48h_df['created_at'].dt.hour
             last_48h_df['day'] = last_48h_df['created_at'].dt.date
             
-            for scale_id in sorted(last_48h_df['scale_id'].unique()):
+            # Obtener todas las básculas conocidas (incluyendo las sin actividad)
+            all_known_scales = set(scales.keys())
+            scales_with_data = set(last_48h_df['scale_id'].unique())
+            all_scales = all_known_scales.union(scales_with_data)
+            
+            for scale_id in sorted(all_scales):
                 scale_hourly = []
                 scale_df = last_48h_df[last_48h_df['scale_id'] == scale_id]
                 
