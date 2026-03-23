@@ -1,6 +1,32 @@
-import { Activity, Scale, Cow, TrendingUp, AlertTriangle } from 'lucide-react'
+import { Activity, Scale, TrendingUp, AlertTriangle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { getKPIs } from '../services/api'
+
+// Icono personalizado de vaca/animal
+const CowIcon = ({ className, strokeWidth = 2 }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={strokeWidth}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M3 12c0-3.314 2.686-6 6-6s6 2.686 6 6" />
+    <path d="M9 18v-6" />
+    <circle cx="9" cy="9" r="1" />
+    <path d="M15 12c0-3.314 2.686-6 6-6" />
+    <path d="M15 18v-6" />
+    <circle cx="15" cy="9" r="1" />
+    <path d="M6 18h12" />
+    <path d="M9 6V4" />
+    <path d="M15 6V4" />
+  </svg>
+)
 
 export default function KPICards({ authenticated = false }) {
   const [kpis, setKpis] = useState({
@@ -44,7 +70,7 @@ export default function KPICards({ authenticated = false }) {
       bgColor: 'bg-blue-100 dark:bg-blue-900/20',
     },
     {
-      icon: Cow,
+      icon: CowIcon,
       label: 'Animales Monitorizados',
       value: kpis.totalAnimals,
       color: 'text-green-600 dark:text-green-400',
