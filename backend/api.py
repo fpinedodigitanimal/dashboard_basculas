@@ -171,12 +171,27 @@ def generate_demo_data():
     records = []
     np.random.seed(42)  # Para reproducibilidad
     
+    # Básculas con alertas simuladas (sin actividad reciente)
+    scales_with_alerts_config = {
+        'B00063': 14,  # Sin datos hace 14 días (335 horas)
+        'B00040': 8,   # Sin datos hace 8 días (194 horas)
+        'B00078': 3,   # Sin datos hace 3 días (71 horas)
+        'B00079': 3    # Sin datos hace 3 días (71 horas)
+    }
+    
     for scale_id, group in scales.items():
         # Cada báscula genera entre 50-200 registros por día
         daily_records = np.random.randint(50, 200)
         
+        # Calcular fecha límite para básculas con alertas
+        scale_end_date = end_date
+        if scale_id in scales_with_alerts_config:
+            days_ago = scales_with_alerts_config[scale_id]
+            scale_end_date = end_date - timedelta(days=days_ago)
+            print(f"[DEMO] {scale_id} generará datos solo hasta hace {days_ago} días")
+        
         current_date = start_date
-        while current_date <= end_date:
+        while current_date <= scale_end_date:
             # Variar registros por día (+-30%)
             num_records = int(daily_records * np.random.uniform(0.7, 1.3))
             
@@ -441,6 +456,47 @@ def get_dashboard_data():
         if len(table_data) > 0:
             print(f"[DEBUG] Ejemplo de primera báscula: {table_data[0]}")
         
+        # Generar alertas primero para TODAS las básculas conocidas (no solo las que tienen datos)
+        alerts = []
+        alert_id = 1
+        scales_with_alerts = set()
+        
+        for scale_id in scales.keys():  # Revisar TODAS las básculas conocidas
+            scale_data = df[df['scale_id'] == scale_id]
+            
+            if scale_data.empty:
+                # Báscula sin ningún dato
+                scales_with_alerts.add(scale_id)
+                alerts.append({
+                    'id': alert_id,
+                    'scale_id': scale_id,
+                    'severity': 'error',
+                    'tipo': 'ERROR',
+                    'title': f'Báscula {scale_id} sin datos',
+                    'message': f'No se han registrado datos',
+                    'detalle': 'Báscula nunca ha enviado datos o no está configurada',
+                    'details': 'Báscula nunca ha enviado datos o no está configurada'
+                })
+                alert_id += 1
+            else:
+                # Báscula con datos - verificar última actividad
+                last_record = scale_data['created_at'].max()
+                hours_since = (pd.Timestamp.now() - last_record).total_seconds() / 3600
+                
+                if hours_since > 24:
+                    scales_with_alerts.add(scale_id)
+                    alerts.append({
+                        'id': alert_id,
+                        'scale_id': scale_id,
+                        'severity': 'warning',
+                        'tipo': 'WARNING',
+                        'title': f'Báscula {scale_id} sin actividad',
+                        'message': f'Sin registros hace {int(hours_since)} horas',
+                        'detalle': f'Último registro: {last_record.strftime("%d/%m/%Y %H:%M")}',
+                        'details': f'Último registro: {last_record.strftime("%d/%m/%Y %H:%M")}'
+                    })
+                    alert_id += 1
+        
         # Heatmap data - registros por hora de ayer y hoy (48 horas)
         heatmap_data = []
         yesterday = today - timedelta(days=1)
@@ -449,32 +505,35 @@ def get_dashboard_data():
         if not last_48h_df.empty:
             last_48h_df['hour'] = last_48h_df['created_at'].dt.hour
             last_48h_df['day'] = last_48h_df['created_at'].dt.date
+        
+        # FORZAR la inclusión de básculas conocidas + con alertas + con datos
+        all_known_scales = set(scales.keys())
+        scales_with_data = set(last_48h_df['scale_id'].unique()) if not last_48h_df.empty else set()
+        all_scales = all_known_scales.union(scales_with_data).union(scales_with_alerts)
+        
+        print(f"[DEBUG] Básculas con alertas: {scales_with_alerts}")
+        print(f"[DEBUG] Total básculas a incluir en heatmap: {len(all_scales)}")
+        
+        for scale_id in sorted(all_scales):
+            scale_hourly = []
+            scale_df = last_48h_df[last_48h_df['scale_id'] == scale_id] if not last_48h_df.empty else pd.DataFrame()
             
-            # Obtener todas las básculas conocidas (incluyendo las sin actividad)
-            all_known_scales = set(scales.keys())
-            scales_with_data = set(last_48h_df['scale_id'].unique())
-            all_scales = all_known_scales.union(scales_with_data)
+            # Ayer (0-23)
+            yesterday_df = scale_df[scale_df['day'] == yesterday] if not scale_df.empty else pd.DataFrame()
+            for hour in range(24):
+                count = len(yesterday_df[yesterday_df['hour'] == hour]) if not yesterday_df.empty else 0
+                scale_hourly.append(count)
             
-            for scale_id in sorted(all_scales):
-                scale_hourly = []
-                scale_df = last_48h_df[last_48h_df['scale_id'] == scale_id]
-                
-                # Ayer (0-23)
-                yesterday_df = scale_df[scale_df['day'] == yesterday]
-                for hour in range(24):
-                    count = len(yesterday_df[yesterday_df['hour'] == hour])
-                    scale_hourly.append(count)
-                
-                # Hoy (24-47)
-                today_df = scale_df[scale_df['day'] == today]
-                for hour in range(24):
-                    count = len(today_df[today_df['hour'] == hour])
-                    scale_hourly.append(count)
-                
-                heatmap_data.append({
-                    'scale_id': scale_id,
-                    'hourly': scale_hourly
-                })
+            # Hoy (24-47)
+            today_df = scale_df[scale_df['day'] == today] if not scale_df.empty else pd.DataFrame()
+            for hour in range(24):
+                count = len(today_df[today_df['hour'] == hour]) if not today_df.empty else 0
+                scale_hourly.append(count)
+            
+            heatmap_data.append({
+                'scale_id': scale_id,
+                'hourly': scale_hourly
+            })
         
         # Histogram data - distribución de pesos
         histogram_data = []
@@ -489,28 +548,6 @@ def get_dashboard_data():
                         'scale_id': scale_id,
                         'weights': scale_weights
                     })
-        
-        # Generar alertas simples (sin usar AlertEngine por ahora)
-        alerts = []
-        alert_id = 1
-        
-        for scale_id in df['scale_id'].unique():
-            scale_data = df[df['scale_id'] == scale_id]
-            last_record = scale_data['created_at'].max()
-            hours_since = (pd.Timestamp.now() - last_record).total_seconds() / 3600
-            
-            if hours_since > 24:
-                alerts.append({
-                    'id': alert_id,
-                    'scale_id': scale_id,  # Agregar scale_id para facilitar filtrado
-                    'severity': 'warning',
-                    'tipo': 'WARNING',
-                    'title': f'Báscula {scale_id} sin actividad',
-                    'message': f'Sin registros hace {int(hours_since)} horas',
-                    'detalle': f'Último registro: {last_record.strftime("%d/%m/%Y %H:%M")}',
-                    'details': f'Último registro: {last_record.strftime("%d/%m/%Y %H:%M")}'
-                })
-                alert_id += 1
         
         result = {
             'activeScales': df['scale_id'].nunique(),
